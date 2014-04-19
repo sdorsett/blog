@@ -9,7 +9,7 @@ I've been trying to dedicate more time to working with Puppet and needed a bette
 
 This will be the first of several blog posts in which I will cover:
 
-* Installing Vagant and the vagrant-vsphere plugin on a CentOS 6.x virtual machine
+* [Installing Vagant and the vagrant-vsphere plugin on a CentOS 6.x virtual machine[(https://sdorsett.github.io/2014/04/19/vagrant-install/)
 * Creating a CentOS 6.x template that is customized for Vagrant
 * Defining a Puppet manifest that will automatically run when a template is deployed
 
