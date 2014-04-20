@@ -8,8 +8,6 @@ Some readers might find this post to be a little "in the weeds" and cover detail
 ### 1. Create a CentOS 6.x minimal virtual machine for installing Vagrant. 
 Create or clone a fresh CentOS 6.x minimal virtual machine. I already had an existing Centos 6.5 minimal template that I simply cloned for this purpose.
 
-![VMware clone screenshot](http://sdorsett.github.io/assets/01-clone-existing-template.png)
-
 ### 2. Power on the new cloned vm and connect to the virtual machine console
 
 ### 3. Modify /etc/sysconfig/network, /etc/sysconfig/network-scripts/ifcfg-eth0 & /etc/resolv.conf to reflect the network settings for your vagrant vm:
