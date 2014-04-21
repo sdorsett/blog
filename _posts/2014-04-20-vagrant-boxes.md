@@ -3,14 +3,14 @@ layout: post
 title: Creating a CentOS 6.x template that is customized for Vagrant
 ---
 
-This post will continue our examination of using the vagrant-vsphere plugin, by customizing a CentOS template for integration with Vagrant. Having a Vagrant customize template will allow us to deploy this template and have Vagrant allow us to SSH using the "vagrant ssh" command, as well automatically run puppet manifests when we deploy a vm using Vagrant. Let's get started:
+This post will continue our examination of using the vagrant-vsphere plugin, by customizing a CentOS template for integration with Vagrant. Having a Vagrant customize template will allow us to deploy this template and SSH to the cloned vm using the "vagrant ssh" command, as well automatically run puppet manifests when we deploy a vm using Vagrant. Let's get started:
 
 ### 1. Ensure you have a DHCP server on the network you will be connecting the Vagrant deployed templates to. While you can utilized guest customization to assign a static IP addresses to a Vagrant deployed vm, using DHCP will make this process much easier.
 
 ### 2. Create a CentOS 6.x minimal virtual machine for configuring as our Vagrant CentOS template. 
 Create or clone a fresh CentOS 6.x minimal virtual machine. I already have an existing Centos 6.5 minimal template that I simply cloned for this purpose.
 
-### 3. Power on the new cloned vm and connect using SSH to the IP address DHCP has given this vm.
+### 3. Power on the new cloned vm and connect using SSH to the DHCP assigned IP address for this vm.
 
 ### 4. Ensure you have perl, rsync, ruby & puppet agent installed:
 
@@ -61,7 +61,7 @@ mount: block device /dev/sr0 is write-protected, mounting read-only
 [root@centos-6-5 vmware-tools-distrib]# ./vmware-install.pl
 {% endhighlight %}
 
-You should be able to accept the defaults for all prompts and complete the VMware tools installer. Once the installer has completed ensure under the vm summary this this template vm, the VMware Tools show as "Running" and "Current."
+You should be able to accept the defaults for all prompts and complete the VMware tools installer. Once the installer has completed check the vm summary of this template vm in the vSphere client. The VMware Tools should show as "Running" and "Current."
 
 #### F. Unmount the virtual CDROM using the following command:
 
@@ -69,7 +69,7 @@ You should be able to accept the defaults for all prompts and complete the VMwar
 [root@centos-6-5 ~]# umount /dev/cdrom
 {% endhighlight %}
 
-### 6. We will next follow the steps on [creating a base box](https://docs.vagrantup.com/v2/boxes/base.html) from the Vagrant website. 
+### 6. We will next follow the steps for [creating a base box](https://docs.vagrantup.com/v2/boxes/base.html) from the Vagrant website. 
 
 One thing to point out is we will be configuring the vagrant template for password less SSH using a vagrant user with the password of "vagrant." The Vagrant website mentions 'by default, Vagrant expects a "vagrant" user to SSH into the machine as. This user should be setup with the insecure keypair that Vagrant uses as a default to attempt to SSH. Also, even though Vagrant uses key-based authentication by default, it is a general convention to set the password for the "vagrant" user to "vagrant."'
 
@@ -182,7 +182,7 @@ UseDNS no
 
 This avoids a reverse DNS lookup on the connecting SSH client which can take many seconds.
 
-### 7. Lastly, since this is a template, we will need to remove /etc/udev/rules.d/70-persistent-net.rules file since it contains the MAC address of the current virtual NIC. It will be recreated on boot up or when we deploy other virtual machines from this template.
+### 7. Lastly this is a template, so we will need to remove /etc/udev/rules.d/70-persistent-net.rules file because it contains the MAC address of the current virtual NIC. It will be recreated on boot up or when we deploy other virtual machines from this template.
 
 ### 8. We will now shutdown the template by running halt:
 
@@ -240,7 +240,7 @@ Connection to 192.168.1.133 closed.
 ==> default: Calling vShpere Destroy
 {% endhighlight %}
 
-### Hopefully you found this post helpful in demonstrating how useful it is to create a vagrant specific template to use with the vagrant-vsphere plugin. The next blog post will be covering how to take advantage of the rsync features of vagrant to run a specific puppet manifest on a vm deployed using vagrant.
+### Hopefully you found this post helpful in demonstrating how to create a vagrant specific template to use with the vagrant-vsphere plugin. The next blog post will be covering how to take advantage of the rsync features of vagrant to run a specific puppet manifest on a vm deployed using vagrant.
 
 ### Please provide any feedback or suggestions to my twitter account located on the about page.
 
