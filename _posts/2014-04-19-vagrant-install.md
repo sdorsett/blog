@@ -219,7 +219,7 @@ In this configuration file:
 
 * "vsphere.host" is your vCenter server FQDN or IP address
 * "vsphere.name" will be the name of the virtual machine that gets created
-* "vsphere.clone_from_vm" specifies we will be cloning a vm rather than template
+* "vsphere.clone\_from\_vm" specifies we will be cloning a vm rather than template
 * "vsphere.template_name" is the name of the vm we will be cloning
 * "vsphere.user" is the username we will be using to connect to vCenter
 * "vsphere.password" is the password we will be using to connect ot vCenter
