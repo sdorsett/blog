@@ -240,7 +240,7 @@ Connection to 192.168.1.133 closed.
 ==> default: Calling vShpere Destroy
 {% endhighlight %}
 
-### Hopefully you found this post helpful in demonstrating how to create a vagrant specific template to use with the vagrant-vsphere plugin. The next blog post will be covering how to take advantage of the rsync features of vagrant to run a specific puppet manifest on a vm deployed using vagrant.
+### Hopefully you found this post helpful in demonstrating how to create a vagrant specific template to use with the vagrant-vsphere plugin. The next blog post will be covering how to take advantage of customization specifications and advanced Vagrantfile configurations on a vm deployed using vagrant.
 
 ### Please provide any feedback or suggestions to my twitter account located on the about page.
 

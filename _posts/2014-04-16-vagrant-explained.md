@@ -11,6 +11,7 @@ This will be the first of several blog posts in which I will cover:
 
 * [Installing Vagant and the vagrant-vsphere plugin on a CentOS 6.x virtual machine](https://sdorsett.github.io/2014/04/19/vagrant-install/)
 * [Creating a CentOS 6.x template that is customized for Vagrant](https://sdorsett.github.io/2014/04/20/vagrant-boxes/)
+* [Using advanced vagrant-vsphere provider settings and vCenter guest customization](https://sdorsett.github.io/2014/04/24/vagrant-and-vcenter-guest-customization/)
 * Defining a Puppet manifest that will automatically run when a template is deployed
 
 

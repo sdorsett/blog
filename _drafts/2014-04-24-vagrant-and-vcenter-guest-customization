@@ -1,0 +1,30 @@
+---
+layout: post
+title: Using advanced vagrant-vsphere provider settings and vCenter guest customization
+---
+
+This post will pick up where we left off by demonstrating more vagrant-vsphere provider settings with the CentOS template we customized in the last blog post. Let's get started:
+
+### 1. Create a new customization specification in the vSphere web client.
+
+#### A. Go to Home | Customization Specification Manager
+
+![screenshot]({{https://sdorsett.github.io }}/assets/01-web-client-home.jpg)
+
+
+
+### 2. Create a CentOS 6.x minimal virtual machine for configuring as our Vagrant CentOS template. 
+Create or clone a fresh CentOS 6.x minimal virtual machine. I already have an existing Centos 6.5 minimal template that I simply cloned for this purpose.
+
+### 3. Power on the new cloned vm and connect using SSH to the DHCP assigned IP address for this vm.
+
+### 4. Ensure you have perl, rsync, ruby & puppet agent installed:
+
+#### A. Import the EPEL 6 key and RPM:
+
+{% highlight bash %}
+[root@centos-6-5 ~]# rpm --import http://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-6
+[root@centos-6-5 ~]# rpm -Kih http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+########################################### [100%]
+########################################### [100%]
+{% endhighlight %}
