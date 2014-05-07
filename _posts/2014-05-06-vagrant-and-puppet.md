@@ -13,7 +13,7 @@ For testing purposes we will be creating a Puppet manifest that ensures NTP is i
 * 1.pool.ntp.org
 * 2.pool.ntp.org
 
-#### A. First we should install tree, since it will help us visualize the directory structure of the puppet manifest directory we'll be creating:
+#### A. First we should install tree, since it will help us visualize the directory structure of the puppet manifest directories we will be creating:
 
 {% highlight bash %}
 [root@vagrant vagrant-vms]# yum install -y tree
