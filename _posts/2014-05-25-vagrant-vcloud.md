@@ -7,7 +7,7 @@ While continuing to explore what the vagrant-vsphere provider is capable of I ca
 
 Over the next few blog posts I intend to cover the following vagrant-vcloud provider related topics:
 
-* [Installing Vagant and the vagrant-vcloud plugin on a CentOS 6.x virtual machine in vCloud Directory or vCHS](https://sdorsett.github.io/2014/04/19/vagrant-install/)
+* [Installing Vagant and the vagrant-vcloud plugin on a CentOS 6.x virtual machine in vCloud Directory or vCHS](https://sdorsett.github.io/2014/05/26/vagrant-install/)
 * Creating a simple vagrant-vcloud Vagrantfile configuration to deploy a vm 
 * Creating a more advanced vagrant-vcloud Vagrantfile configuration
 * Creating a CentOS 6.x .box that is customized for Vagrant and vcloud director

@@ -43,6 +43,8 @@ nameserver 8.8.8.8
 nameserver 8.8.4.4
 {% endhighlight %}
 
+At this point you should have network connectivity to your new vagrant vapp. While I won't cover it in the post, you can now either setup a DNAT rule to forward SSH to the vagrant vapp or continue the configuration using the vapp console.
+
 ### 3. Install Ruby 1.9.3 using ruby-build:
 
 #### A. Use yum to install the packages we'll need to get ruby, rubygems and vagrant installed:
@@ -138,7 +140,7 @@ Installed the plugin 'vagrant-vcloud (0.3.3)'!
 
 ### 7. Creating a Vagrantfile for testing vagrant-vcloud install 
 
-#### A.  We need to create a directory structure and Vagrantfile to test that the vagrant-vcloud provider is properly working. For the .box file we will use a sample precise32 (Ubuntu 12.04 32bit) vagrant .box file created for the vcloud provider by Timo Sugliani: 
+#### A.  We need to create a directory structure and Vagrantfile to test that the vagrant-vcloud provider is properly working. For the .box file we will use a sample precise32 (Ubuntu 12.04 32bit) vagrant .box file created for the vcloud provider by [Timo Sugliani](http://blog.tsugliani.fr/): 
 
 {% highlight bash %}
 [root@vagrant ~]# mkdir -p ~/vagrant-vms/precise32-test
@@ -156,7 +158,7 @@ Vagrant.configure("2") do |config|
   # vCloud Director provider settings
   config.vm.provider :vcloud do |vcloud|
 
-    vcloud.hostname = '[Youor_vCHS_vCloud_Director_API_URL]'
+    vcloud.hostname = 'https://[Your_vCD_URL]:443'
     vcloud.username = '[Your_vCHS_username@somedomain.com]'
     vcloud.password = '[Your_vCHS_password]'
 
@@ -164,7 +166,7 @@ Vagrant.configure("2") do |config|
     vcloud.vdc_name = '[Your_vCHS_vdc_name]'
     vcloud.catalog_name = '[Your_vCHS_org_catalog]'
     vcloud.network_bridge = true
-    vcloud.vdc_network_name = '[Your_vCHS_vdc_network_name]'
+    vcloud.vdc_network_name = '[Your_vCHS_vdc_name]-default-routed'
 
   end
 
@@ -178,99 +180,120 @@ Vagrant.configure("2") do |config|
 end
 {% endhighlight %}
 
+In this configuration file:
+
+* "vcloud.hostname" is your vCloud Director FQDN or IP address. This should be the base URL and not by the specific URL for your org.
+* "vcloud.username" is the username we will be using to connect to vCHS or vCloud Director
+* "vcloud.password" is the password we will be using to connect to vCHS or vCloud Director
+* "vcloud.org_name" will be the name of your vCHS or vCloud Director organization
+* "vcloud.vdc_name" will be the name of your vCHS or vCloud Director virtual datacenter
+* "vcloud.catalog_name" will be the name of your organization catalog a template derived from the .box file will be created in
+* "vcloud.dc\_network\_name" is the organization network the vagrant vapp will be connected to
+
 #### B.  Now we can change directory to that directory and test everything with a "vagrant up --provider=vcloud":
 
 {% highlight bash %}
-[root@vagrant ~]# cd /root/.vagrant.d/gems/gems/vagrant-vsphere-0.8.1/example_box
-[root@vagrant example_box]# tar cvzf dummy.box ./metadata.json
-./metadata.json
+[root@vagrant ~]# cd ~/vagrant-vms/precise32-test
+oot@vagrant precise32-test]# vagrant up --provider=vcloud
+Bringing machine 'test-vm' up with 'vcloud' provider...
+==> test-vm: Box 'precise32' could not be found. Attempting to find and install...
+    test-vm: Box Provider: vcloud
+    test-vm: Box Version: >= 0
+==> test-vm: Adding box 'precise32' (v0) for provider: vcloud
+    test-vm: Downloading: http://vagrant.tsugliani.fr/precise32.box
+==> test-vm: Successfully added box 'precise32' (v0) for 'vcloud'!
+==> test-vm: Catalog item [precise32] in Catalog [Org Private Catalog] does not exist!
+    test-vm: Would you like to upload the [precise32] box to [Org Private Catalog] Catalog?
+    test-vm: Choice (yes/no): yes
+==> test-vm: Uploading [precise32]...
+Uploading Box...
+Uploading Box...
+Uploading Box... Progress: 22%  ETA: 00:02:16                                          
 {% endhighlight %}
 
-#### C.  Next we will create a new folder under /root for storing the box file we created and other vagrant configuration files
+Once the .box files has started uploading, you can check the progress in the org catalog of your vCloud Director instance:
+
+![screenshot]({{https://sdorsett.github.io }}/assets/06-precise32-upload.png)
+
+#### C. The uploading progress will get to 100% and you will see the vApp getting created, powered on and SSH access achieved:
 
 {% highlight bash %}
-[root@vagrant example_box]# mkdir -p ~/vagrant-vms/example_box
-[root@vagrant example_box]# mv dummy.box ~/vagrant-vms/example_box
+Uploading Box...
+Uploading Box... Progress: 100% Time: 00:02:32                                                                                                   
+==> test-vm: Adding [precise32] to Catalog [Org Private Catalog]
+==> test-vm: Building vApp...
+==> test-vm: vApp Vagrant-root-vagrant-8b9115d1 successfully created.
+==> test-vm: Powering on VM...
+==> test-vm: Waiting for SSH Access on 192.168.109.4:22 ... 
+==> test-vm: Waiting for SSH Access on 192.168.109.4:22 ... 
+==> test-vm: Waiting for SSH Access on 192.168.109.4:22 ... 
+==> test-vm: Rsyncing folder: /root/vagrant-vms/precise32-test/ => /vagrant
+[root@vagrant precise32-test]# root@vagrant precise32-test]#
 {% endhighlight %}
 
-#### D. Vagrant reads it's configuration from a file named Vagrantfile, located in the directory from which the "vagrant up" command is run in. We need to go back to our "vagrant-vms" folder and create this file:
+#### D. Test network connectivity by running "vagrant ssh":
 
 {% highlight bash %}
-[root@vagrant example_box]# cd ~/vagrant-vms/
-[root@vagrant vagrant-vms]# touch Vagrantfile
+root@vagrant precise32-test]# vagrant ssh
+==> test-vm: External IP for test-vm: 192.168.109.4
+Welcome to Ubuntu 12.04 LTS (GNU/Linux 3.2.0-23-generic-pae i686)
+
+ * Documentation:  https://help.ubuntu.com/
+Welcome to your Vagrant-built virtual machine.
+Last login: Thu Jul 18 11:20:25 2013
+vagrant@test-vm:~$ hostname -f
+test-vm
 {% endhighlight %}
 
-#### E. Modify the Vagrantfile to reflect your vsphere configuration. Here's an example of my working Vagrantfile:
+#### E. Run "vagrant vcloud --status" to validate the vCloud Director status of your vagrant vapp:
 
 {% highlight bash %}
-[root@vagrant vagrant-vms]# cat Vagrantfile
-
-Vagrant.configure("2") do |config|
-  config.vm.box = 'dummy'
-  config.vm.box_url = './example_box/dummy.box'
-
-  config.vm.provider :vsphere do |vsphere|
-    vsphere.host = 'vcenter.mylab.net'
-    vsphere.name = 'vagrant-test'
-    vsphere.clone_from_vm = true
-    vsphere.template_name = 'Centos-6.5'
-    vsphere.user = 'root@localos'
-    vsphere.password = 'S0meR@nd0mP@ssw0rd'
-    vsphere.insecure = true
-  end
-end
+root@vagrant precise32-test]# vagrant vcloud --status
+Initializing vCloud Director provider...
+Fetching vCloud Director status...
++-------------------------------+-----------------------------------------+
+|  Vagrant vCloud Director Status : https://[Your_vCD_URL]:443            |
++-------------------------------+-----------------------------------------+
+| Organization Name             | [Your_vCHS_org_name]                    |
+| Organization vDC Name         | vCHS-vagrant-demo                       |
+| Organization vDC ID           | b9494d6a-ebda-4368-8f76-0e93b7edcb17    |
+| Organization vDC Network Name | [Your_vCHS_vdc_name]-default-routed     |
++-------------------------------+-----------------------------------------+
+| vApp Name                     | Vagrant-root-vagrant-8b9115d1           |
+| vAppID                        | ec918e84-6026-42b2-8639-5390d8c88b0c    |
+| -> test-vm                    | 4fc82b9b-c79d-483b-9a71-a87d22289102    |
++-------------------------------+-----------------------------------------+
 {% endhighlight %}
 
-In this configuration file:
-
-* "vsphere.host" is your vCenter server FQDN or IP address
-* "vsphere.name" will be the name of the virtual machine that gets created
-* "vsphere.clone\_from\_vm" specifies we will be cloning a vm rather than template
-* "vsphere.template_name" is the name of the vm we will be cloning
-* "vsphere.user" is the username we will be using to connect to vCenter
-* "vsphere.password" is the password we will be using to connect ot vCenter
-* "vsphere.insecure" tells vagrant to not worry about validating the certificate on the vCenter server
-
-### 9. Vargrant up!!!!
-If everything has gone correctly up to this point we can issue a "vagrant up --provider=vsphere" command from the directory that contains the Vagrantfile:
+#### F. Run "vagrant vcloud --network" to validate the vCloud Director network mapping of your vagrant vapp:
 
 {% highlight bash %}
-[root@vagrant vagrant-vms]# vagrant up --provider=vsphere
-Bringing machine 'default' up with 'vsphere' provider...
-==> default: Calling vSphere CloneVM with the following settings:
-==> default:  -- Source VM: CentOS-6.5
-==> default:  -- Name: vagrant-test
-==> default: Waiting for SSH to become available...
+[root@vagrant precise32-test]# vagrant vcloud --network
+Initializing vCloud Director provider...
+Fetching vCloud Director network settings ...
++---------+---------------+------------+
+|             Network Map              |
++---------+---------------+------------+
+| VM Name | IP Address    | Connection |
++---------+---------------+------------+
+| test-vm | 192.168.109.4 | Direct     |
++---------+---------------+------------+
 {% endhighlight %}
 
-You should see a "Clone virtual machine" task being run on your vCenter server and then completing.
-
-### 10. Canceling the "Vagrant up" command and destroying our cloned vm.
-Since we have not properly prepared the vm we are cloning (I will have another blog post covering this topic) Vagrant will never be able to successfully connect to the cloned vm using SSH. As a result we will need to cancel the "vagrant up" command:
-
-#### A. Press [control-c] to attempt to gracefully exit "vagrant-up"
+#### g. Destroy the cloned vm by running "vagrant destroy" command:
 
 {% highlight bash %}
-^C==> default: Waiting for cleanup before exiting...
+[root@vagrant precise32-test]# vagrant destroy
+    test-vm: Are you sure you want to destroy the 'test-vm' VM? [y/N] y
+==> test-vm: Powering off VM...
+==> test-vm: Single VM left in the vApp, Powering off vApp...
+==> test-vm: Destroying vApp...
+[root@vagrant precise32-test]# 
 {% endhighlight %}
 
-I've never seen this task complete so I will press [control-c] again to immediately exit:
+You should see "Power Off vapp" and "Delete vapp" tasks being run and then completing on your organizations vapps.
 
-{% highlight bash %}
-^C==> default: Exiting immediately, without cleanup!
-{% endhighlight %}
-
-#### B. Destroy the cloned vm by running "vagrant destroy" command:
-
-{% highlight bash %}
-[root@vagrant vagrant-vms]# vagrant destroy
-==> default: Calling vSphere PowerOff
-==> default: Calling vShpere Destroy
-{% endhighlight %}
-
-You should see a "Power Off virtual machine" and "Delet virtual machine" tasks being run and then completing on your vCenter server.
-
-### Hopefully you found this post helpful in getting vagrant and the vagrant-vsphere plugin installed and configured. The next blog post will be covering how to create a template vm that has been prepared for vagrant to connect seemlessly using SSH.
+### Hopefully you found this post helpful in getting vagrant and the vagrant-cloud plugin installed and configured. The next blog post will be covering how to modify the Vagrantfile to create a vapp in a vCHS or vCloud Director instance that doesn't contain the vagrant vm.
 
 ### Please provide any feedback or suggestions to my twitter account located on the about page.
 
