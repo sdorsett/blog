@@ -1,0 +1,183 @@
+---
+layout: post
+title: Installing a ESXi 6.0 virtual machine for use with Packer
+---
+
+In order to begin using Packer to create images, we will first need to lay the "virtual" ground work. Packer can create virtual machine images on a wide variety of virtualization or cloud platforms, but since I work for VMware I have been using the ESXi hypervisor.
+
+* This post will be covering installing ESXi as a virtual machine, there is no reason that would prevent you from using a physical server that has ESXi installed for Packer.
+* These steps were performed using the vCenter 6.0 web client. You could just as well use ESXi 5, but the steps for setting up nested virtualization will be slightly different.
+* There is nothing new about the steps covered, but I figured it would be best to go ahead and document them.
+* If you are looking for the best resources regarding creating ESXi virtual machines, I would suggest taking a look at [William Lam's blog](http://www.virtuallyghetto.com/) which covers this subject in great detail. Williams site also provides more details about the embedded host client we will install.
+
+Let's get started...
+
+## 1. Log into the web client of your vCenter instance and create a new virtual machine.
+
+![screenshot]({{https://sdorsett.github.io }}/assets/01-new-virtual-machine.jpg)  
+
+## 2. Step through the new virtual machine wizard:
+
+![screenshot]({{https://sdorsett.github.io }}/assets/02-create-new-virtual-machine.jpg)  
+
+Name the virtual machine what you would like and click next.
+
+![screenshot]({{https://sdorsett.github.io }}/assets/03-virtual-machine-name.jpg)  
+
+Select the vCenter cluster or resource pool and click next.
+
+![screenshot]({{https://sdorsett.github.io }}/assets/04-select-compute-resource.jpg)  
+
+Select the datastore you want the ESXi virtual machine to be created on and click next.
+
+![screenshot]({{https://sdorsett.github.io }}/assets/05-select-storage.jpg)  
+
+Select the compatibility (virtual hardware level) for the virtual machine and click next.
+
+![screenshot]({{https://sdorsett.github.io }}/assets/06-select-compatibility.jpg)  
+
+Select the guest operating system. vSphere 6.0 or newer will allow you to select ESXi 6.0 as you guest OS. Click next.
+
+![screenshot]({{https://sdorsett.github.io }}/assets/07-select-guest-os.jpg)  
+
+Customize to virtual hardware to have the necessary resources. I had created my ESXi vurtual machine with:
+
+* 2 vCPU
+* 16 GB of memory
+* 100GB virtual hard drive
+
+![screenshot]({{https://sdorsett.github.io }}/assets/08-customize-hardware.jpg)  
+
+Make sure you expand CPU and enable "Hardware virtualization." The ESXi installer will fail if this is not enabled.
+
+![screenshot]({{https://sdorsett.github.io }}/assets/09-customize-hardware.jpg)  
+
+Click finish to create the virtual machine.
+
+![screenshot]({{https://sdorsett.github.io }}/assets/10-ready-to-complete.jpg)  
+
+## 3. Connect the virtual CDROM of the ESXi virtual machine to the ESXi 6.0 installer .iso and power it on.
+
+![screenshot]({{https://sdorsett.github.io }}/assets/11-start-esxi-vm.jpg)  
+
+## 4. Connect to the console of the ESXi virtual machine and step through the installer
+
+Press enter to begin
+
+![screenshot]({{https://sdorsett.github.io }}/assets/12-esxi-installer.jpg)  
+
+Press F11 to accept the EULA
+
+![screenshot]({{https://sdorsett.github.io }}/assets/13-esxi-installer.jpg)  
+
+Select the 100GB virtual hard drive we created with the virtual machine
+
+![screenshot]({{https://sdorsett.github.io }}/assets/14-esxi-installer.jpg)  
+
+Select your keyboard layout and press enter
+
+![screenshot]({{https://sdorsett.github.io }}/assets/15-esxi-installer.jpg)  
+
+Enter the root password twice and press enter
+
+![screenshot]({{https://sdorsett.github.io }}/assets/16-esxi-installer.jpg)  
+
+![screenshot]({{https://sdorsett.github.io }}/assets/17-esxi-installer.jpg)  
+
+Press F11 to begin the install process
+
+![screenshot]({{https://sdorsett.github.io }}/assets/18-esxi-installer.jpg)  
+
+Disconnect the .iso file from the virtual CDROM before rebooting the virtual machine
+
+![screenshot]({{https://sdorsett.github.io }}/assets/19-esxi-installer.jpg)  
+
+![screenshot]({{https://sdorsett.github.io }}/assets/20-esxi-installer.jpg)  
+
+![screenshot]({{https://sdorsett.github.io }}/assets/21-esxi-post-install.jpg)  
+
+## 5. Press F2 to log into ESXi and make the following changes:
+
+* Set the management IP address, subnet mask and gateway
+* Set the hostname, dns servers and search domain
+* Enable ssh
+
+![screenshot]({{https://sdorsett.github.io }}/assets/22-set-ip-address.jpg)  
+
+![screenshot]({{https://sdorsett.github.io }}/assets/23-apply-network-config.jpg)  
+
+![screenshot]({{https://sdorsett.github.io }}/assets/24-enable-ssh.jpg)  
+
+## 6. On your local machine download the embedded host client .vib
+
+You can download the embedded host client .vib from [this link] (https://labs.vmware.com/flings/esxi-embedded-host-client).
+
+![screenshot]({{https://sdorsett.github.io }}/assets/25-download-embedded-host-client.jpg)  
+
+## 7. SCP the downloaded .vib to the ESXi virtual machine
+
+{% highlight bash %}
+sdorsett-mbp:~ sdorsett$ scp ~/Downloads/esxui_signed.vib root@192.168.1.51:/tmp/
+The authenticity of host '192.168.1.51 (192.168.1.51)' cant be established.
+RSA key fingerprint is 82:e9:6b:9e:9d:ac:d7:8a:65:e2:9e:bf:60:fc:2b:df.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '192.168.1.51' (RSA) to the list of known hosts.
+Password: ********
+esxui_signed.vib                                                                                                                                100% 2805KB   2.7MB/s   00:00
+sdorsett-mbp:~ sdorsett$
+{% endhighlight %}
+
+## 7. SSH to the ESXi virtual machine and install the embedded host client .vib
+
+{% highlight bash %}
+sdorsett-mbp:~ sdorsett$ ssh root@192.168.1.51
+Password: ********
+The time and date of this login have been sent to the system logs.
+
+VMware offers supported, powerful system administration tools.  Please
+see www.vmware.com/go/sysadmintools for details.
+
+The ESXi Shell can be disabled by an administrative user. See the
+vSphere Security documentation for more information.
+
+[root@packer-esxi:~] cd tmp
+[root@packer-esxi:/tmp] ls
+esxui_signed.vib  nfsgssd_krb5cc    probe.session     vmware-root
+
+[root@packer-esxi:/tmp] esxcli software vib install -v /tmp/esxui_signed.vib
+Installation Result
+   Message: Operation finished successfully.
+   Reboot Required: false
+   VIBs Installed: VMware_bootbank_esx-ui_0.0.2-0.1.3357452
+   VIBs Removed:
+   VIBs Skipped:
+
+[root@packer-esxi:/tmp]
+{% endhighlight %}
+
+## 8. Enable guest ip hack on the ESXi virtual machine
+
+The [Packer VMware .iso builder documentation](https://www.packer.io/docs/builders/vmware-iso.html) lists the following esxcli command as needing to be run on the ESXi virtual machine:
+
+![screenshot]({{https://sdorsett.github.io }}/assets/28-enable-guest-ip-hack.jpg)  
+
+{% highlight bash %}
+[root@packer-esxi:/tmp] esxcli system settings advanced set -o /Net/GuestIPHack -i 1
+[root@packer-esxi:/tmp] exit
+Connection to 192.168.1.51 closed.
+sdorsett-mbp:~ sdorsett$
+{% endhighlight %}
+
+## 9. Log into the embedded host client using the browser on your local machine to validate that it it working properly
+
+![screenshot]({{https://sdorsett.github.io }}/assets/26-embedded-host-client.jpg)  
+
+Under Storage | Datastores we can see a datastore name "datastore1" was automatically created using the extra space of the virtual hard drive.
+
+![screenshot]({{https://sdorsett.github.io }}/assets/27-embedded-host-client.jpg)  
+
+
+
+That all for this post covering how to create a ESXi virtual machine that we will use to create Packer images.
+
+Please provide any feedback or suggestions to my twitter account located on the about page.
