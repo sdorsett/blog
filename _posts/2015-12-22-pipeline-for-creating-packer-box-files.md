@@ -8,7 +8,7 @@ Recently at work, the vCloud Air Zombie team has been using Packer to generate V
 This will be the first of several blog posts in which I intend to cover:
 
 * [Installing a ESXi 6.0 virtual machine for use with Packer](https://sdorsett.github.io/2015/12/23/installing-esxi-virtual-machine-for-packer-depolyment/) - this is what Packer will be using to create the image.
-* Setting up Packer, ovftool and Apache web server on a CentOS virtual machine - this will be where Packer is run from.
+* [Setting up Packer, ovftool and Apache web server on a CentOS virtual machine](https://sdorsett.github.io/2015/12/24/installing-packer-and-ovftool-on-centos/) - this will be where the Packer templates are run from.
 * Creating up our first Packer template for installing CentOS 6.7 along with vmtools - templates are the "recipes" for what ingredients go into a Packer image.
 * Copying our existing CentOS 6.7 template and adding the Puppet agent - having the puppet agent in an image allows us to use puppet to describe configurations using puppet in either Packer and Vagrant.
 * Using ovftool to convert Packer generated virtual machines, into Vagrant .box files - ovftool allows you to export the Packer created images in either a Fusion or vSphere compatible format.
