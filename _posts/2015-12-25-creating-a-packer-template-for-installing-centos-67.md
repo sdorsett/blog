@@ -1118,11 +1118,10 @@ The output of the packer build command shows that the template was successfully 
 
 ###This seems like a good point to take break. We covered a lot of ground in this post, but as a result of all our work we have a working Packer template to build on.  
 
-###If you would like to not have to manually create the files in the scripts/ and templates/ directories you can clone down the following github repository:
+###If you would like to not have to manually create the files covered in this post, you can clone down [this github repository](https://github.com/sdorsett/packer-templates/tree/first-packer-template) by running the following command:
 
 <pre>
-git clone https://github.com/sdorsett/packer-templates.git
-git checkout "first-packer-template"
+git clone -b "first-packer-template" https://github.com/sdorsett/packer-templates.git
 </pre>  
 
 ### You will still need to create the iso/ directory, download the needed .iso files and create the packer-remote-info.json file as covered in this post.  
