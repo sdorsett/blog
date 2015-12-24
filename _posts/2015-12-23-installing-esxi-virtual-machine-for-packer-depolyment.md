@@ -58,7 +58,7 @@ Click finish to create the virtual machine.
 
 ![screenshot]({{https://sdorsett.github.io }}/assets/10-ready-to-complete.jpg)  
 
-## 3. Enable promiscuous mode on virtual porgroup being used by ESXi virtual machine
+## 3. Enable promiscuous mode on virtual portgroup being used by ESXi virtual machine
 
 You will need to ensure the portgroup (virtual network) you are connecting the ESXi virtual machine to has promiscuous mode enabled. Enabling promiscuous mode is required for the ESXi virtual machine to pass traffic to the child virtual machines running on it.
 
