@@ -864,7 +864,7 @@ The third provisioner is a shell provisioner that will run the scripts/centos-vm
     centos67:
 {% endhighlight %}
 
-The final provisioner is a shell provisioner that will run the scripts/centos-vmware-cleanup.sh bash script. This script clean up the Centos67 virtual machine and zero out all unused disk space to reduce the size of the image.
+The final provisioner is a shell provisioner that will run the scripts/centos-vmware-cleanup.sh bash script. This script will clean up the centos67 virtual machine and zero out all unused disk space to reduce the size of the image.
 
 {% highlight bash %}
 ==> centos67: Provisioning with shell script: scripts/centos-vmware-cleanup.sh
@@ -922,7 +922,7 @@ The final provisioner is a shell provisioner that will run the scripts/centos-vm
     centos67: 13599232000 bytes (14 GB) copied, 413.4 s, 32.9 MB/s
 {% endhighlight %}
 
-With the provisioners block having been completed, Packer will now shutdown the CentOS 6.7 virtual machine and unregister it from the ESXi virtual machine.
+With the provisioners block having been completed, Packer will now shutdown the centos67 virtual machine and unregister it from the ESXi virtual machine.
 
 {% highlight bash %}
 ==> centos67: Gracefully halting virtual machine...
