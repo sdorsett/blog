@@ -298,7 +298,7 @@ fi
 
 # Installing vagrant keys
 mkdir -pm 700 $VAGRANT_HOME/.ssh
-wget --no-check-certificate "${VAGRANT_KEY_URL}" -O $VAGRANT_HOME/.ssh/authorized_keys
+echo "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key" >> $VAGRANT_HOME/.ssh/authorized_keys
 chmod 0600 $VAGRANT_HOME/.ssh/authorized_keys
 chown -R $VAGRANT_USER:$VAGRANT_USER $VAGRANT_HOME/.ssh
 [root@packer-centos packer-templates]#
@@ -398,9 +398,6 @@ echo "==> Remove the SSH host keys"
 echo "==> Remove the root user’s shell history"
 /bin/rm -f ~root/.bash_history
 unset HISTFILE
-
-echo "==> Installed packages"
-rpm -qa
 
 echo "==> yum -y clean all"
 yum -y clean all
@@ -609,11 +606,46 @@ centos67 output will be in this color.
 ==> centos67: Connecting to VM via VNC
 ==> centos67: Typing the boot command over VNC...
 ==> centos67: Waiting for SSH to become available...
+{% endhighlight %}
+
+At this point you should see a centos67 virtual machine in the embedded host client of the ESXi virtual machine.
+
+![screenshot]({{https://sdorsett.github.io }}/assets/01-centos67-virtual-machine.png)  
+
+If you open the console of the centos67 virtual machine, you can watch the automated install as it progresses.
+
+![screenshot]({{https://sdorsett.github.io }}/assets/02-centos67-automated-install.png)  
+
+![screenshot]({{https://sdorsett.github.io }}/assets/03-centos67-automated-install.png)  
+
+![screenshot]({{https://sdorsett.github.io }}/assets/04-centos67-automated-install.png)  
+
+![screenshot]({{https://sdorsett.github.io }}/assets/05-centos67-install-completed.png)  
+
+Once the CentOS 6.7 install completes and the virtual machine reboots, you will see the packer build output continue with the provisioners block of the Packer template.
+
+{% highlight bash %}
 ==> centos67: Connected to SSH!
+{% endhighlight %}
+
+The first provisioner is the file provisioner that will copy iso/vmware-tools-linux.iso to /tmp/vmware-tools-linux.iso within the CentOS 6.7 virtual machine.
+
+{% highlight bash %}
 ==> centos67: Uploading iso/vmware-tools-linux.iso => /tmp/vmware-tools-linux.iso
+{% endhighlight %}
+
+The second provisioner is a shell provisioner that will run the scripts/centos-vagrant-settings.sh bash script. This script will added the necessary changes for this Packer image to be used by Vagrant.
+
+{% highlight bash %}
+
 ==> centos67: Provisioning with shell script: scripts/centos-vagrant-settings.sh
-    centos67: /tmp/script_7943.sh: line 20: wget: command not found
-    centos67: chmod: cannot access `/home/vagrant/.ssh/authorized_keys': No such file or directory
+
+{% endhighlight %}
+
+The third provisioner is a shell provisioner that will run the scripts/centos-vmware-tools_install.sh bash script. This script will install all the needed dependencies for vmtools and then install vmtools using an answer file.
+
+{% highlight bash %}
+
 ==> centos67: Provisioning with shell script: scripts/centos-vmware-tools_install.sh
     centos67: Loaded plugins: fastestmirror
     centos67: Setting up Upgrade Process
@@ -830,6 +862,11 @@ centos67 output will be in this color.
     centos67:
     centos67: --the VMware team
     centos67:
+{% endhighlight %}
+
+The final provisioner is a shell provisioner that will run the scripts/centos-vmware-cleanup.sh bash script. This script clean up the Centos67 virtual machine and zero out all unused disk space to reduce the size of the image.
+
+{% highlight bash %}
 ==> centos67: Provisioning with shell script: scripts/centos-vmware-cleanup.sh
     centos67: ==> Pausing for 0 seconds...
     centos67: ==> erasing unused packages to free up space
@@ -863,220 +900,6 @@ centos67 output will be in this color.
     centos67: ==> Cleaning up tmp
     centos67: ==> Remove the SSH host keys
     centos67: ==> Remove the root user’s shell history
-    centos67: ==> Installed packages
-    centos67: setup-2.8.14-20.el6_4.1.noarch
-    centos67: basesystem-10.0-4.el6.noarch
-    centos67: kernel-firmware-2.6.32-573.el6.noarch
-    centos67: glibc-common-2.12-1.166.el6.x86_64
-    centos67: glibc-2.12-1.166.el6.x86_64
-    centos67: bash-4.1.2-33.el6.x86_64
-    centos67: libcap-2.16-5.5.el6.x86_64
-    centos67: info-4.13a-8.el6.x86_64
-    centos67: audit-libs-2.3.7-5.el6.x86_64
-    centos67: libacl-2.2.49-6.el6.x86_64
-    centos67: nspr-4.10.8-1.el6_6.x86_64
-    centos67: libselinux-2.0.94-5.8.el6.x86_64
-    centos67: sed-4.2.1-10.el6.x86_64
-    centos67: nss-util-3.18.0-1.el6_6.x86_64
-    centos67: bzip2-libs-1.0.5-7.el6_0.x86_64
-    centos67: libstdc++-4.4.7-16.el6.x86_64
-    centos67: gawk-3.1.7-10.el6.x86_64
-    centos67: libgpg-error-1.7-4.el6.x86_64
-    centos67: libudev-147-2.63.el6.x86_64
-    centos67: grep-2.20-3.el6.x86_64
-    centos67: sqlite-3.6.20-1.el6.x86_64
-    centos67: libidn-1.18-2.el6.x86_64
-    centos67: xz-libs-4.999.9-0.5.beta.20091007git.el6.x86_64
-    centos67: nss-softokn-3.14.3-22.el6_6.x86_64
-    centos67: bzip2-1.0.5-7.el6_0.x86_64
-    centos67: libselinux-utils-2.0.94-5.8.el6.x86_64
-    centos67: cpio-2.10-12.el6_5.x86_64
-    centos67: libxml2-2.7.6-20.el6.x86_64
-    centos67: tcp_wrappers-libs-7.6-57.el6.x86_64
-    centos67: libtasn1-2.3-6.el6_5.x86_64
-    centos67: p11-kit-trust-0.18.5-2.el6_5.2.x86_64
-    centos67: libnih-1.0.1-7.el6.x86_64
-    centos67: file-5.04-21.el6.x86_64
-    centos67: libusb-0.1.12-23.el6.x86_64
-    centos67: libutempter-1.1.5-4.1.el6.x86_64
-    centos67: psmisc-22.6-19.el6_5.x86_64
-    centos67: vim-minimal-7.4.629-5.el6.x86_64
-    centos67: procps-3.2.8-33.el6.x86_64
-    centos67: e2fsprogs-libs-1.41.12-22.el6.x86_64
-    centos67: binutils-2.20.51.0.2-5.43.el6.x86_64
-    centos67: diffutils-2.8.1-28.el6.x86_64
-    centos67: dash-0.5.5.1-4.el6.x86_64
-    centos67: groff-1.18.1.4-21.el6.x86_64
-    centos67: coreutils-libs-8.4-37.el6.x86_64
-    centos67: cracklib-2.8.16-4.el6.x86_64
-    centos67: coreutils-8.4-37.el6.x86_64
-    centos67: module-init-tools-3.9-25.el6.x86_64
-    centos67: redhat-logos-60.0.14-12.el6.centos.noarch
-    centos67: libpciaccess-0.13.3-0.1.el6.x86_64
-    centos67: nss-3.18.0-5.3.el6_6.x86_64
-    centos67: nss-tools-3.18.0-5.3.el6_6.x86_64
-    centos67: libedit-2.11-4.20080712cvs.1.el6.x86_64
-    centos67: mingetty-1.08-5.el6.x86_64
-    centos67: krb5-libs-1.10.3-42.el6.x86_64
-    centos67: libssh2-1.4.2-1.el6_6.1.x86_64
-    centos67: rpm-libs-4.8.0-47.el6.x86_64
-    centos67: rpm-4.8.0-47.el6.x86_64
-    centos67: gnupg2-2.0.14-8.el6.x86_64
-    centos67: fipscheck-lib-1.2.0-7.el6.x86_64
-    centos67: mysql-libs-5.1.73-5.el6_6.x86_64
-    centos67: pciutils-libs-3.1.10-4.el6.x86_64
-    centos67: libcap-ng-0.6.4-3.el6_0.1.x86_64
-    centos67: python-2.6.6-64.el6.x86_64
-    centos67: python-pycurl-7.19.0-8.el6.x86_64
-    centos67: pygpgme-0.1-18.20090824bzr68.el6.x86_64
-    centos67: python-iniparse-0.3.1-2.1.el6.noarch
-    centos67: newt-0.52.11-3.el6.x86_64
-    centos67: ustr-1.0.4-9.1.el6.x86_64
-    centos67: libaio-0.3.107-10.el6.x86_64
-    centos67: gamin-0.1.10-9.el6.x86_64
-    centos67: shared-mime-info-0.70-6.el6.x86_64
-    centos67: grubby-7.0.15-7.el6.x86_64
-    centos67: yum-plugin-fastestmirror-1.1.30-30.el6.noarch
-    centos67: dbus-glib-0.86-6.el6.x86_64
-    centos67: centos-release-6-7.el6.centos.12.3.x86_64
-    centos67: iptables-1.4.7-16.el6.x86_64
-    centos67: iputils-20071127-20.el6.x86_64
-    centos67: initscripts-9.03.49-1.el6.centos.x86_64
-    centos67: device-mapper-libs-1.02.95-2.el6.x86_64
-    centos67: device-mapper-event-libs-1.02.95-2.el6.x86_64
-    centos67: device-mapper-event-1.02.95-2.el6.x86_64
-    centos67: cryptsetup-luks-libs-1.2.0-11.el6.x86_64
-    centos67: kpartx-0.4.9-87.el6.x86_64
-    centos67: plymouth-0.8.3-27.el6.centos.1.x86_64
-    centos67: cyrus-sasl-2.1.23-15.el6_6.2.x86_64
-    centos67: cronie-anacron-1.4.4-15.el6.x86_64
-    centos67: crontabs-1.10-33.el6.noarch
-    centos67: selinux-policy-3.7.19-279.el6.noarch
-    centos67: kbd-1.15-11.el6.x86_64
-    centos67: dracut-kernel-004-388.el6.noarch
-    centos67: fuse-2.8.3-4.el6.x86_64
-    centos67: system-config-firewall-base-1.2.27-7.2.el6_6.noarch
-    centos67: cryptsetup-luks-1.2.0-11.el6.x86_64
-    centos67: openssh-clients-5.3p1-111.el6.x86_64
-    centos67: mdadm-3.3.2-5.el6.x86_64
-    centos67: dhclient-4.1.1-49.P1.el6.centos.x86_64
-    centos67: passwd-0.77-4.el6_2.2.x86_64
-    centos67: grub-0.97-94.el6.x86_64
-    centos67: sudo-1.8.6p3-19.el6.x86_64
-    centos67: e2fsprogs-1.41.12-22.el6.x86_64
-    centos67: acl-2.2.49-6.el6.x86_64
-    centos67: bridge-utils-1.2-10.el6.x86_64
-    centos67: gpg-pubkey-c105b9de-4e0fd3a3
-    centos67: perl-Module-Pluggable-3.90-141.el6_7.1.x86_64
-    centos67: perl-libs-5.10.1-141.el6_7.1.x86_64
-    centos67: perl-5.10.1-141.el6_7.1.x86_64
-    centos67: libgcc-4.4.7-16.el6.x86_64
-    centos67: filesystem-2.4.30-3.el6.x86_64
-    centos67: ncurses-base-5.7-4.20090207.el6.x86_64
-    centos67: tzdata-2015e-1.el6.noarch
-    centos67: nss-softokn-freebl-3.14.3-22.el6_6.x86_64
-    centos67: ncurses-libs-5.7-4.20090207.el6.x86_64
-    centos67: libattr-2.4.44-7.el6.x86_64
-    centos67: zlib-1.2.3-29.el6.x86_64
-    centos67: popt-1.13-7.el6.x86_64
-    centos67: libcom_err-1.41.12-22.el6.x86_64
-    centos67: db4-4.7.25-19.el6_6.x86_64
-    centos67: libsepol-2.0.41-4.el6.x86_64
-    centos67: chkconfig-1.3.49.3-5.el6.x86_64
-    centos67: shadow-utils-4.1.4.2-19.el6_6.1.x86_64
-    centos67: readline-6.0-4.el6.x86_64
-    centos67: libuuid-2.17.2-12.18.el6.x86_64
-    centos67: libblkid-2.17.2-12.18.el6.x86_64
-    centos67: file-libs-5.04-21.el6.x86_64
-    centos67: dbus-libs-1.2.24-8.el6_6.x86_64
-    centos67: pcre-7.8-7.el6.x86_64
-    centos67: lua-5.1.4-4.1.el6.x86_64
-    centos67: cyrus-sasl-lib-2.1.23-15.el6_6.2.x86_64
-    centos67: expat-2.0.1-11.el6_2.x86_64
-    centos67: elfutils-libelf-0.161-3.el6.x86_64
-    centos67: libgcrypt-1.4.5-11.el6_4.x86_64
-    centos67: findutils-4.4.2-6.el6.x86_64
-    centos67: checkpolicy-2.0.22-1.el6.x86_64
-    centos67: which-2.19-6.el6.x86_64
-    centos67: pth-2.0.7-9.3.el6.x86_64
-    centos67: sysvinit-tools-2.87-6.dsf.el6.x86_64
-    centos67: p11-kit-0.18.5-2.el6_5.2.x86_64
-    centos67: device-mapper-persistent-data-0.3.2-1.el6.x86_64
-    centos67: upstart-0.6.5-13.el6_5.3.x86_64
-    centos67: gmp-4.3.1-7.el6_2.2.x86_64
-    centos67: MAKEDEV-3.24-6.el6.x86_64
-    centos67: pinentry-0.7.6-8.el6.x86_64
-    centos67: net-tools-1.60-110.el6_2.x86_64
-    centos67: tar-1.23-13.el6.x86_64
-    centos67: db4-utils-4.7.25-19.el6_6.x86_64
-    centos67: libss-1.41.12-22.el6.x86_64
-    centos67: m4-1.4.13-5.el6.x86_64
-    centos67: make-3.81-20.el6.x86_64
-    centos67: ncurses-5.7-4.20090207.el6.x86_64
-    centos67: less-436-13.el6.x86_64
-    centos67: gzip-1.3.12-22.el6.x86_64
-    centos67: cracklib-dicts-2.8.16-4.el6.x86_64
-    centos67: pam-1.1.1-20.el6.x86_64
-    centos67: hwdata-0.233-14.1.el6.noarch
-    centos67: plymouth-scripts-0.8.3-27.el6.centos.1.x86_64
-    centos67: ca-certificates-2015.2.4-65.0.1.el6_6.noarch
-    centos67: nss-sysinit-3.18.0-5.3.el6_6.x86_64
-    centos67: logrotate-3.7.8-23.el6.x86_64
-    centos67: gdbm-1.8.0-38.el6.x86_64
-    centos67: keyutils-libs-1.4-5.el6.x86_64
-    centos67: openssl-1.0.1e-42.el6.x86_64
-    centos67: libcurl-7.19.7-46.el6.x86_64
-    centos67: curl-7.19.7-46.el6.x86_64
-    centos67: openldap-2.4.40-5.el6.x86_64
-    centos67: gpgme-1.1.8-3.el6.x86_64
-    centos67: fipscheck-1.2.0-7.el6.x86_64
-    centos67: ethtool-3.5-6.el6.x86_64
-    centos67: plymouth-core-libs-0.8.3-27.el6.centos.1.x86_64
-    centos67: libffi-3.0.5-3.2.el6.x86_64
-    centos67: python-libs-2.6.6-64.el6.x86_64
-    centos67: python-urlgrabber-3.9.1-9.el6.noarch
-    centos67: rpm-python-4.8.0-47.el6.x86_64
-    centos67: slang-2.2.1-1.el6.x86_64
-    centos67: newt-python-0.52.11-3.el6.x86_64
-    centos67: libsemanage-2.0.43-5.1.el6.x86_64
-    centos67: pkgconfig-0.23-9.1.el6.x86_64
-    centos67: glib2-2.28.8-4.el6.x86_64
-    centos67: libuser-0.56.13-5.el6.x86_64
-    centos67: yum-metadata-parser-1.1.2-16.el6.x86_64
-    centos67: yum-3.2.29-69.el6.centos.noarch
-    centos67: dhcp-common-4.1.1-49.P1.el6.centos.x86_64
-    centos67: policycoreutils-2.0.83-24.el6.x86_64
-    centos67: iproute-2.6.32-45.el6.x86_64
-    centos67: util-linux-ng-2.17.2-12.18.el6.x86_64
-    centos67: udev-147-2.63.el6.x86_64
-    centos67: device-mapper-1.02.95-2.el6.x86_64
-    centos67: openssh-5.3p1-111.el6.x86_64
-    centos67: lvm2-libs-2.02.118-2.el6.x86_64
-    centos67: device-mapper-multipath-libs-0.4.9-87.el6.x86_64
-    centos67: libdrm-2.4.59-2.el6.x86_64
-    centos67: rsyslog-5.8.10-10.el6_6.x86_64
-    centos67: postfix-2.6.6-6.el6_5.x86_64
-    centos67: cronie-1.4.4-15.el6.x86_64
-    centos67: iptables-ipv6-1.4.7-16.el6.x86_64
-    centos67: kbd-misc-1.15-11.el6.noarch
-    centos67: dracut-004-388.el6.noarch
-    centos67: kernel-2.6.32-573.el6.x86_64
-    centos67: selinux-policy-targeted-3.7.19-279.el6.noarch
-    centos67: device-mapper-multipath-0.4.9-87.el6.x86_64
-    centos67: lvm2-2.02.118-2.el6.x86_64
-    centos67: openssh-server-5.3p1-111.el6.x86_64
-    centos67: b43-openfwwf-5.2-10.el6.noarch
-    centos67: iscsi-initiator-utils-6.2.0.873-14.el6.x86_64
-    centos67: authconfig-6.1.12-23.el6.x86_64
-    centos67: efibootmgr-0.5.4-13.el6.x86_64
-    centos67: audit-2.3.7-5.el6.x86_64
-    centos67: xfsprogs-3.1.1-16.el6.x86_64
-    centos67: attr-2.4.44-7.el6.x86_64
-    centos67: rootfiles-8.1-6.1.el6.noarch
-    centos67: perl-Pod-Escapes-1.04-141.el6_7.1.x86_64
-    centos67: perl-version-0.77-141.el6_7.1.x86_64
-    centos67: perl-Pod-Simple-3.13-141.el6_7.1.x86_64
-    centos67: fuse-libs-2.8.3-4.el6.x86_64
     centos67: ==> yum -y clean all
     centos67: Loaded plugins: fastestmirror
     centos67: Cleaning repos: base extras updates
@@ -1097,6 +920,11 @@ centos67 output will be in this color.
     centos67: 12970+0 records in
     centos67: 12969+0 records out
     centos67: 13599232000 bytes (14 GB) copied, 413.4 s, 32.9 MB/s
+{% endhighlight %}
+
+With the provisioners block having been completed, Packer will now shutdown the CentOS 6.7 virtual machine and unregister it from the ESXi virtual machine.
+
+{% highlight bash %}
 ==> centos67: Gracefully halting virtual machine...
     centos67: Waiting for VMware to clean up after itself...
 ==> centos67: Deleting unnecessary VMware files...
@@ -1114,7 +942,7 @@ Build 'centos67' finished.
 [root@packer-centos packer-templates]#
 {% endhighlight %}
 
-The output of the packer build command shows that the template was successfully created at /vmfs/volumes/datastore1/output-centos67, but the virtual machine was unregistered from ESXi.
+The output of the packer build command shows that the template was successfully created at /vmfs/volumes/datastore1/output-centos67 on the ESXi virtual machine.
 
 ###This seems like a good point to take break. We covered a lot of ground in this post, but as a result of all our work we have a working Packer template to build on.  
 
