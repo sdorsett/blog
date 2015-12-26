@@ -559,7 +559,7 @@ nothing added to commit but untracked files present (use "git add" to track)
 {% endhighlight %}
 
 ## 12. Push the changes we have made to a github repository
-I create a public github repository for storing all the files created during this Packer series. During this step I will be pushing the current state of the files to the ["first-packer-template" branch](https://github.com/sdorsett/packer-templates/tree/first-packer-template) of this this github repository:
+I created a public github repository for storing all the files created during this Packer series. During this step I will be pushing the current state of the files to the ["first-packer-template" branch](https://github.com/sdorsett/packer-templates/tree/first-packer-template) of this github repository:
 
 {% highlight bash %}
 [root@packer-centos packer-templates]# git remote add origin https://sdorsett@github.com/sdorsett/packer-templates.git
