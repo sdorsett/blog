@@ -3,6 +3,8 @@ layout: post
 title: Installing a ESXi 6.0 virtual machine for use with Packer
 ---
 
+This is the second in a series of posts on [using a Packer pipeline to generate Vagrant .box files](https://sdorsett.github.io/2015/12/22/pipeline-for-creating-packer-box-files/).
+
 In order to begin using Packer to create images, we will first need to lay the "virtual" ground work. Packer can create virtual machine images on a wide variety of virtualization or cloud platforms, but since I work for VMware I have been using the ESXi hypervisor.
 
 * This post will be covering installing ESXi as a virtual machine on a vSphere cluster. There is no reason that you couldn't use Packer with a stand alone physical server that has ESXi installed as well.

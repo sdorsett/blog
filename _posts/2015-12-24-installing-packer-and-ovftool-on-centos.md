@@ -3,6 +3,8 @@ layout: post
 title: Setting up Packer, ovftool and Apache web server on a CentOS virtual machine
 ---
 
+This is the third in a series of posts on [using a Packer pipeline to generate Vagrant .box files](https://sdorsett.github.io/2015/12/22/pipeline-for-creating-packer-box-files/).
+
 In the [last post](https://sdorsett.github.io/2015/12/23/installing-esxi-virtual-machine-for-packer-depolyment/) we setup a ESXi virtual machine that would be the target for creating Packer images. In order to follow along with this post you will need two things:
 
 * A fresh CentOS virtual machine on which we will install Packer - I'm using CentOS 6.6 minimal install named "packer-centos" with 2 vCPU, 4GB of memory and a 100GB virtual hard drive. I also gave this virtual machine the IP address of 192.168.1.52

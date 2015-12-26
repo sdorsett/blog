@@ -1,13 +1,11 @@
 ---
 layout: post
-title: Copying our existing CentOS 6.7 template and adding the Puppet agent
+title: Using ovftool to convert Packer generated virtual machines, into Vagrant .box files
 ---
 
-This is the fifth in a series of posts on [using a Packer pipeline to generate Vagrant .box files](https://sdorsett.github.io/2015/12/22/pipeline-for-creating-packer-box-files/).
+This is the sixth in a series of posts on [using a Packer pipeline to generate Vagrant .box files](https://sdorsett.github.io/2015/12/22/pipeline-for-creating-packer-box-files/).
 
-In the last post we covered [creating a Packer template for installing CentOS 6.7 with vmtools](https://sdorsett.github.io/2015/12/25/creating-a-packer-template-for-installing-centos-67/). In this post we will be basing a new Packer template on the one we created last post and add installing the Puppet Enterprise 3.8.2 agent.
-
-This is an older version of the Puppet Enterprise agent, but it will let us create a Vagrant .box file that can be used for testing Puppet 3.x code.
+In the last post we covered [copying our existing CentOS 6.7 template and adding the Puppet agent](https://sdorsett.github.io/2015/12/26/copy-our-existing-template-and-add-the-puppet-agent/) in order to generate a new Packer template. In this post we will be showing how to use ovftool to convert Packer generated virtual machines into Vagrant .box files.
 
 Let's get started...
 
@@ -16,61 +14,21 @@ Let's get started...
 {% highlight bash %}
 sdorsett-mbp:~ sdorsett$ ssh root@192.168.1.52
 root@192.168.1.52's password:
-Last login: Fri Dec 25 20:22:44 2015 from 192.168.1.253
+Last login: Sat Dec 26 20:52:17 2015 from 192.168.1.163
 [root@packer-centos ~]#
 {% endhighlight %}
 
-## 2. Create a new bash script named centos-install-pe-puppet-382.sh at packer-templates/scripts/ to install the Puppet Enterprise 3.8.2 agent:
+## 2. Create two new directories for downloading virtual machines, one for .ovf and one for .vmx virtual machine formats.
 
 {% highlight bash %}
-[root@packer-centos ~]# cd ~/packer-templates/scripts/
-[root@packer-centos scripts]# cat centos-install-pe-puppet-382.sh
-#!/bin/bash
+root@packer-centos ~]# mkdir -p ~/box-files/{ovf,vmx}
+[root@packer-centos ~]# tree ~/box-files/
+/root/box-files/
+├── ovf
+└── vmx
 
-VERSION='3.8.2'
-PKGNAME="puppet-enterprise-${VERSION}-el-6-x86_64"
-TARFILE="${PKGNAME}.tar.gz"
-URL="https://pm.puppetlabs.com/puppet-enterprise/${VERSION}/${TARFILE}"
-
-TMPDIR='/tmp'
-HOSTNAME=`hostname`
-cd $TMPDIR
-echo "Fetching ${TARFILE}"
-[ -e $TARFILE ] || curl -fLO $URL
-echo "Extracting ${TARFILE}"
-[ -d $PKGNAME ] || tar -xf $TARFILE
-cd $PKGNAME
-
-cat > agent.ans <<EOF
-q_all_in_one_install=n
-q_database_install=n
-q_pe_database=n
-q_puppetca_install=n
-q_puppetdb_install=n
-q_puppetmaster_install=n
-q_puppet_enterpriseconsole_install=n
-q_run_updtvpkg=n
-q_continue_or_reenter_master_hostname=c
-q_fail_on_unsuccessful_master_lookup=n
-q_puppetagent_certname=$HOSTNAME
-q_puppetagent_install=y
-q_puppetagent_server=puppet
-q_puppet_cloud_install=y
-q_puppet_symlinks_install=y
-q_vendor_packages_install=y
-q_install=y
-EOF
-
-./puppet-enterprise-installer -a agent.ans
-
-# Remove certname so the system will use host FQDN
-sed -i '/certname =/d' /etc/puppetlabs/puppet/puppet.conf
-
-# Symlink so puppet is in vagrant provisioner PATH
-ln -s /opt/puppet/bin/facter /usr/bin/facter
-ln -s /opt/puppet/bin/puppet /usr/bin/puppet
-
-[root@packer-deploy scripts]#
+2 directories, 0 files
+[root@packer-centos ~]#
 {% endhighlight %}
 
 ## 3. Copy the Packer template we created previously, as the starting point for a new CentOS 6.7 template that will have Puppet Enterprise 3.8.2 installed

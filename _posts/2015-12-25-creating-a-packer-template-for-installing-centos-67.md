@@ -3,6 +3,8 @@ layout: post
 title: Creating our first Packer template for installing CentOS 6.7 with vmtools
 ---
 
+This is the fourth in a series of posts on [using a Packer pipeline to generate Vagrant .box files](https://sdorsett.github.io/2015/12/22/pipeline-for-creating-packer-box-files/).
+
 In the last two posts we covered [installing a ESXi virtual machine for use with Packer](https://sdorsett.github.io/2015/12/23/installing-esxi-virtual-machine-for-packer-depolyment/) and [Setting up Packer, ovftool and Apache web server on a CentOS virtual machine](https://sdorsett.github.io/2015/12/24/installing-packer-and-ovftool-on-centos/). In this post we will be putting all this prep work to use in order to install a CentOS 6.7 image using Packer.
 
 Before we get started I would like to mentioned that many of the configuration files I am using have been influenced by or directly copied from the following github repositories:  
