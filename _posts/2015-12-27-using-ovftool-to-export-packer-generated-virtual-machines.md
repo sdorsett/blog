@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Using ovftool to convert Packer generated virtual machines, into Vagrant .box files
+title: Using ovftool to convert Packer generated virtual machines into Vagrant .box files
 ---
 
 This is the sixth in a series of posts on [using a Packer pipeline to generate Vagrant .box files](https://sdorsett.github.io/2015/12/22/pipeline-for-creating-packer-box-files/).
@@ -125,7 +125,7 @@ Completed successfully
 [root@packer-centos ~]#
 {% endhighlight %}
 
-## 7. We will start with converting the .ovf exported templates. 
+## 7. We will start with converting the .ovf exported templates.
 
 Each of the exported template directories will need a metadata.js and Vagrantfile created. After creating the metadata.js and Vagrantfile files, we will tar all of the files in each directory into a .box file.
 
