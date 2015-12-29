@@ -12,7 +12,7 @@ This will be the first of several blog posts in which I intend to cover:
 * [Creating our first Packer template for installing CentOS 6.7 with vmtools](https://sdorsett.github.io/2015/12/25/creating-a-packer-template-for-installing-centos-67/) - templates are the instructions for how a Packer image should be built.
 * [Copying our existing CentOS 6.7 template and adding the Puppet agent](https://sdorsett.github.io/2015/12/26/copy-our-existing-template-and-add-the-puppet-agent/) - having the puppet agent in an image allows us to use puppet to describe configurations using puppet in either Packer and Vagrant.
 * [Using ovftool to convert Packer generated virtual machines into Vagrant .box files](https://sdorsett.github.io/2015/12/27/using-ovftool-to-export-packer-generated-virtual-machines/) - ovftool allows you to export the Packer created images in either a Fusion or vSphere compatible format.
-* Hosting the resulting Vagrant .box files on a web server - Hosting the .box files on a web server allows them to be easily used within Vagrantfiles.
+* [Scripted Packer build, ovftool export and Vagrant .box file creation](https://sdorsett.github.io/2015/12/28/scripted-packer-build-and-export/) - pulling everything we have done with Packer template creation and ovftool export into a single script
 
 I have also created a github repository to contain the Packer configuration files using during this series. You can access the github repository at [https://github.com/sdorsett/packer-templates](https://github.com/sdorsett/packer-templates).
 
