@@ -259,6 +259,18 @@ We can also open a browser and see the .box files the script generated.
 ![screenshot]({{https://sdorsett.github.io }}/assets/01-browse-vagrant-box-files.png)  
 
 
+###If you would like to not have to manually create the build script covered in this post, you can clone down [this github repository](https://github.com/sdorsett/packer-templates/tree/adding-build-script) by running the following command:
+
+<pre>
+git clone -b "adding-build-script" https://github.com/sdorsett/packer-templates.git
+</pre>  
+
+If you cloned the packer-templates repo in the last post, you can pull down the updates by running the following command:
+
+<pre>
+git fetch --all
+git pull origin "adding-build-script"
+</pre>  
 
 ###This brings us to the end of this post. I hope I made good on my promise of showing an automated ways of converting the Packer templates to .box files. In the next post I think we should cover how to test our Vagrant .box files are functional by deploying them using Vagrant.
 
