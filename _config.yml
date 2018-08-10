@@ -1,6 +1,7 @@
 # Dependencies
 markdown:         redcarpet
-pygments:         true
+#pygments:         true
+highlighter:      true
 
 # Permalinks
 permalink:        pretty
@@ -16,6 +17,7 @@ author:
   url:            https://twitter.com/standorsett
 
 paginate:         5
+plugins:          [jekyll-paginate]
 
 # Custom vars
 version:          1.0.0
